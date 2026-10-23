@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="An advanced end-to-end Twitter Sentiment Analysis dashboard with real-time text analysis, batch CSV predictions, performance analytics, and training console.">
+    <title>Twitter Sentiment Analysis Dashboard</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js for interactive analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="dark-theme">
+    <div class="app-container">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar-nav">
+            <div class="sidebar-brand">
+                <span class="brand-icon">⚡</span>
+                <span class="brand-name">SentimenTweet</span>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <button class="nav-item active" data-tab="tab-predict" id="nav-predict">
+                    <span class="nav-icon">🔮</span>
+                    <span class="nav-label">Sentiment Sandbox</span>
+                </button>
+                <button class="nav-item" data-tab="tab-compare" id="nav-compare">
+                    <span class="nav-icon">⚔️</span>
+                    <span class="nav-label">Sentiment Battle</span>
+                </button>
+                <button class="nav-item" data-tab="tab-batch" id="nav-batch">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-label">Batch CSV Mode</span>
+                </button>
+                <button class="nav-item" data-tab="tab-dashboard" id="nav-dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-label">Analytics Dashboard</span>
+                </button>
+                <button class="nav-item" data-tab="tab-console" id="nav-console">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-label">Training Console</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <span class="model-badge" id="active-model-badge">Best Model: Loading...</span>
+            </div>
+        </aside>
+
+        <!-- Main Workspace Area -->
+        <main class="main-content">
+            
+            <!-- HEADER -->
+            <header class="app-header">
+                <div class="header-title">
+                    <h1 id="page-title">Sentiment Sandbox</h1>
+                    <p id="page-subtitle" class="text-secondary">Analyze individual tweets in real-time with machine learning.</p>
+                </div>
+                <div class="header-actions">
+                    <div class="theme-switch-wrapper">
+                        <label class="theme-switch" for="theme-toggle">
+                            <input type="checkbox" id="theme-toggle" checked>
+                            <span class="slider round"></span>
+                        </label>
+                        <span class="theme-label" id="theme-text">Dark Mode</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- TAB CONTENT CONTAINER -->
+            <div class="tab-content-container">
+
+                <!-- TAB 1: PREDICTOR SANDBOX -->
+                <section class="tab-panel active" id="tab-predict">
+                    <div class="grid-2col">
+                        
+                        <!-- Input Card -->
+                        <div class="glass-card">
+                            <div class="card-header">
+                                <h2 class="card-title">Write a Tweet</h2>
+                                <span class="card-badge info">Real-time Ready</span>
+                            </div>
+                            
+                            <div class="input-group">
+                                <textarea id="tweet-input" placeholder="Type a tweet here to analyze its sentiment... (e.g., 'Today is an amazing day, I feel so energetic!')" maxlength="280" rows="5"></textarea>
+                                <div class="char-counter"><span id="char-count">0</span> / 280</div>
+                            </div>
+                            
+                            <div class="form-group mb-4">
+                                <label for="sandbox-model-select" class="text-sm text-secondary">Classification Algorithm / Model:</label>
+                                <select id="sandbox-model-select" class="form-select">
+                                    <option value="hybrid" selected>⚡ Hybrid Ensemble (ML + VADER Lexicon) [Recommended]</option>
+                                    <option value="ml">🤖 Trained ML Classifier (Logistic Regression)</option>
+                                    <option value="vader">💬 VADER Sentiment Analyzer (Rule-Based)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="actions-row">
+                                <div class="toggle-group">
+                                    <input type="checkbox" id="realtime-toggle" checked>
+                                    <label for="realtime-toggle">Predict while typing</label>
+                                </div>
+                                
+                                <div class="btn-group">
+                                    <button class="btn btn-secondary" id="clear-btn">Clear</button>
+                                    <button class="btn btn-primary" id="predict-btn">Predict Sentiment</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Results Card -->
+                        <div class="glass-card result-card" id="prediction-result-card">
+                            <div class="card-header">
+                                <h2 class="card-title">Prediction Result</h2>
+                                <span class="card-badge" id="sentiment-badge-type">Awaiting Input</span>
+                            </div>
+                            
+                            <div class="result-placeholder" id="result-placeholder">
+                                <div class="placeholder-icon">🔮</div>
+                                <p>Write some text on the left to analyze the sentiment.</p>
+                            </div>
+
+                            <div class="result-data hidden" id="result-data-panel">
+                                <div class="sentiment-display">
+                                    <div class="emoji-container" id="sentiment-emoji">😐</div>
+                                    <div class="sentiment-text">
+                                        <div class="sentiment-label" id="sentiment-label">NEUTRAL</div>
+                                        <div class="sentiment-confidence">Confidence: <span id="sentiment-confidence-val">0.00%</span></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="gauge-container">
+                                    <svg class="gauge" viewBox="0 0 100 50">
+                                        <path class="gauge-bg" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke-width="8"></path>
+                                        <path class="gauge-fill" id="gauge-fill-arc" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke-width="8" stroke-dasharray="125.6" stroke-dashoffset="125.6"></path>
+                                    </svg>
+                                    <div class="gauge-value" id="gauge-percentage">50%</div>
+                                </div>
+                                
+                                <div class="probabilities-section">
+                                    <h3 class="section-title">Probability Breakdown</h3>
+                                    <div class="prob-bar-group">
+                                        <div class="prob-bar-label">
+                                            <span>Positive Sentiment</span>
+                                            <span id="prob-pos-text">50.0%</span>
+                                        </div>
+                                        <div class="prob-bar-track">
+                                            <div class="prob-bar-fill positive" id="prob-pos-bar" style="width: 50%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="prob-bar-group">
+                                        <div class="prob-bar-label">
+                                            <span>Negative Sentiment</span>
+                                            <span id="prob-neg-text">50.0%</span>
+                                        </div>
+                                        <div class="prob-bar-track">
+                                            <div class="prob-bar-fill negative" id="prob-neg-bar" style="width: 50%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sentiment Keyword Highlighting -->
+                                <div class="keywords-section mt-4" id="keywords-panel">
+                                    <h3 class="section-title">Sentiment Keywords & Text Highlight</h3>
+                                    <div class="highlighted-tweet-box" id="highlighted-tweet-text">
+                                    </div>
+                                    <div class="keyword-tags mt-2" id="keyword-tags-container">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Prediction History -->
+                    <div class="glass-card mt-6">
+                        <div class="card-header">
+                            <h2 class="card-title">Prediction History</h2>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-secondary" id="clear-history-btn">Clear History</button>
+                                <button class="btn btn-sm btn-primary" id="download-history-btn">Download History</button>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table" id="history-table">
+                                <thead>
+                                    <tr>
+                                        <th>Original Text</th>
+                                        <th>Algorithm</th>
+                                        <th>Sentiment</th>
+                                        <th>Confidence</th>
+                                        <th>Timestamp</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-table-body">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-secondary">No predictions run yet.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 2: SENTIMENT BATTLE (TWEET COMPARISON) MODE -->
+                <section class="tab-panel" id="tab-compare">
+                    <div class="grid-2col">
+                        <!-- Tweet A Input Card -->
+                        <div class="glass-card compare-card">
+                            <div class="card-header">
+                                <h2 class="card-title">Contender A</h2>
+                                <span class="card-badge info">Tweet A</span>
+                            </div>
+                            <div class="input-group">
+                                <textarea id="compare-input-a" placeholder="Enter Tweet A (e.g. 'I am so excited for this amazing product launch, feeling so happy!')" rows="4"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Tweet B Input Card -->
+                        <div class="glass-card compare-card">
+                            <div class="card-header">
+                                <h2 class="card-title">Contender B</h2>
+                                <span class="card-badge info">Tweet B</span>
+                            </div>
+                            <div class="input-group">
+                                <textarea id="compare-input-b" placeholder="Enter Tweet B (e.g. 'This update is terrible and completely ruined my workflow.')" rows="4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="actions-row mt-2 mb-6 text-center">
+                        <button class="btn btn-primary btn-lg" id="run-compare-btn" style="margin: 0 auto;">⚔️ Launch Sentiment Battle</button>
+                    </div>
+
+                    <!-- SENTIMENT BATTLE RESULT CARDS (MATCHING USER SCREENSHOT) -->
+                    <div class="hidden" id="compare-summary-card">
+                        <div class="glass-card mb-4">
+                            <div class="card-header" style="margin-bottom: 0;">
+                                <h2 class="card-title">Battle Winner Outcome</h2>
+                                <span class="card-badge positive" id="compare-winner-badge">Winner: Tweet A</span>
+                            </div>
+                        </div>
+
+                        <!-- Side-by-side Result Cards for Tweet A & Tweet B -->
+                        <div class="grid-2col">
+                            
+                            <!-- Tweet A Result Card -->
+                            <div class="glass-card result-card">
+                                <div class="card-header">
+                                    <h2 class="card-title">Tweet A Result</h2>
+                                    <span class="card-badge" id="battle-badge-a">Positive</span>
+                                </div>
+                                <div class="result-data">
+                                    <div class="sentiment-display">
+                                        <div class="emoji-container" id="battle-emoji-a">😊</div>
+                                        <div class="sentiment-text">
+                                            <div class="sentiment-label" id="battle-label-a">POSITIVE</div>
+                                            <div class="sentiment-confidence">Confidence: <span id="battle-conf-a">0.00%</span></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="gauge-container">
+                                        <svg class="gauge" viewBox="0 0 100 50">
+                                            <path class="gauge-bg" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke-width="8"></path>
+                                            <path class="gauge-fill" id="battle-gauge-fill-a" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke-width="8" stroke-dasharray="125.6" stroke-dashoffset="125.6"></path>
+                                        </svg>
+                                        <div class="gauge-value" id="battle-gauge-val-a">50%</div>
+                                    </div>
+                                    
+                                    <div class="probabilities-section">
+                                        <h3 class="section-title">Probability Breakdown</h3>
+                                        <div class="prob-bar-group">
+                                            <div class="prob-bar-label">
+                                                <span>Positive Sentiment</span>
+                                                <span id="battle-pos-text-a">50.0%</span>
+                                            </div>
+                                            <div class="prob-bar-track">
+                                                <div class="prob-bar-fill positive" id="battle-pos-bar-a" style="width: 50%;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="prob-bar-group">
+                                            <div class="prob-bar-label">
+                                                <span>Negative Sentiment</span>
+                                                <span id="battle-neg-text-a">50.0%</span>
+                                            </div>
+                                            <div class="prob-bar-track">
+                                                <div class="prob-bar-fill negative" id="battle-neg-bar-a" style="width: 50%;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tweet B Result Card -->
+                            <div class="glass-card result-card">
+                                <div class="card-header">
+                                    <h2 class="card-title">Tweet B Result</h2>
+                                    <span class="card-badge" id="battle-badge-b">Negative</span>
+                                </div>
+                                <div class="result-data">
+                                    <div class="sentiment-display">
+                                        <div class="emoji-container" id="battle-emoji-b">😢</div>
+                                        <div class="sentiment-text">
+                                            <div class="sentiment-label" id="battle-label-b">NEGATIVE</div>
+                                            <div class="sentiment-confidence">Confidence: <span id="battle-conf-b">0.00%</span></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="gauge-container">
+                                        <svg class="gauge" viewBox="0 0 100 50">
+                                            <path class="gauge-bg" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke-width="8"></path>
+                                            <path class="gauge-fill" id="battle-gauge-fill-b" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke-width="8" stroke-dasharray="125.6" stroke-dashoffset="125.6"></path>
+                                        </svg>
+                                        <div class="gauge-value" id="battle-gauge-val-b">50%</div>
+                                    </div>
+                                    
+                                    <div class="probabilities-section">
+                                        <h3 class="section-title">Probability Breakdown</h3>
+                                        <div class="prob-bar-group">
+                                            <div class="prob-bar-label">
+                                                <span>Positive Sentiment</span>
+                                                <span id="battle-pos-text-b">50.0%</span>
+                                            </div>
+                                            <div class="prob-bar-track">
+                                                <div class="prob-bar-fill positive" id="battle-pos-bar-b" style="width: 50%;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="prob-bar-group">
+                                            <div class="prob-bar-label">
+                                                <span>Negative Sentiment</span>
+                                                <span id="battle-neg-text-b">50.0%</span>
+                                            </div>
+                                            <div class="prob-bar-track">
+                                                <div class="prob-bar-fill negative" id="battle-neg-bar-b" style="width: 50%;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 3: BATCH CSV MODE -->
+                <section class="tab-panel" id="tab-batch">
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Upload Tweets File (CSV)</h2>
+                            <span class="card-badge info">Vectorized CSV Engine</span>
+                        </div>
+                        
+                        <div class="drag-drop-area" id="csv-drop-zone">
+                            <div class="upload-icon">📁</div>
+                            <h3>Drag & drop your CSV file here</h3>
+                            <p class="text-secondary">or click to browse from your computer</p>
+                            <span class="text-hint">The system will automatically find text columns like 'text', 'tweet', or the first column.</span>
+                            <input type="file" id="csv-file-input" accept=".csv" class="hidden-input">
+                        </div>
+                        
+                        <div class="file-info-container hidden" id="file-info-container">
+                            <div class="file-icon">📄</div>
+                            <div class="file-meta">
+                                <span class="file-name" id="selected-file-name">tweets.csv</span>
+                                <span class="file-size text-secondary" id="selected-file-size">0 KB</span>
+                            </div>
+                            <button class="btn btn-sm btn-secondary" id="remove-file-btn">Remove</button>
+                        </div>
+                        
+                        <div class="form-group mt-4">
+                            <label for="batch-model-select" class="text-sm text-secondary">Classification Algorithm / Model:</label>
+                            <select id="batch-model-select" class="form-select">
+                                <option value="hybrid" selected>⚡ Hybrid Ensemble (ML + VADER Lexicon) [Recommended]</option>
+                                <option value="ml">🤖 Trained ML Classifier (Logistic Regression)</option>
+                                <option value="vader">💬 VADER Sentiment Analyzer (Rule-Based)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="actions-row mt-4">
+                            <button class="btn btn-primary" id="process-csv-btn" disabled>Upload and Predict Sentiment</button>
+                        </div>
+                    </div>
+
+                    <!-- Progress Indicator -->
+                    <div class="progress-card hidden" id="batch-progress-card">
+                        <h3>Processing tweets...</h3>
+                        <div class="progress-bar-track">
+                            <div class="progress-bar-fill animated" id="batch-progress-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Batch Result Summary Card -->
+                    <div class="grid-3col mt-6 hidden" id="batch-results-summary">
+                        <div class="glass-card stat-card positive">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-details">
+                                <span class="stat-label">Positive Sentiment</span>
+                                <h3 class="stat-value" id="batch-pos-pct">0.0%</h3>
+                                <span class="stat-sub" id="batch-pos-count">0 tweets</span>
+                            </div>
+                        </div>
+                        <div class="glass-card stat-card negative">
+                            <div class="stat-icon">📉</div>
+                            <div class="stat-details">
+                                <span class="stat-label">Negative Sentiment</span>
+                                <h3 class="stat-value" id="batch-neg-pct">0.0%</h3>
+                                <span class="stat-sub" id="batch-neg-count">0 tweets</span>
+                            </div>
+                        </div>
+                        <div class="glass-card stat-card info">
+                            <div class="stat-icon">📋</div>
+                            <div class="stat-details">
+                                <span class="stat-label">Total Tweets Analyzed</span>
+                                <h3 class="stat-value" id="batch-total-count">0</h3>
+                                <span class="stat-sub"><button class="btn btn-sm btn-primary" id="download-batch-csv-btn">Download Predictions CSV</button></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Batch Predictions Table -->
+                    <div class="glass-card mt-6 hidden" id="batch-table-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Predictions Report</h2>
+                            <div class="pagination-controls">
+                                <button class="btn btn-xs btn-secondary" id="batch-prev-page">Previous</button>
+                                <span class="page-info" id="batch-page-info">Page 1 of 1</span>
+                                <button class="btn btn-xs btn-secondary" id="batch-next-page">Next</button>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table" id="batch-predictions-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Original Tweet</th>
+                                        <th>Sentiment Prediction</th>
+                                        <th>Confidence Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="batch-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 4: PERFORMANCE DASHBOARD -->
+                <section class="tab-panel" id="tab-dashboard">
+                    
+                    <div class="grid-3col">
+                        <div class="glass-card stat-card bg-gradient-purple">
+                            <div class="stat-icon">🤖</div>
+                            <div class="stat-details">
+                                <span class="stat-label">Active Model Selected</span>
+                                <h3 class="stat-value" id="dash-active-model">Loading...</h3>
+                                <span class="stat-sub" id="dash-vocabulary-size">Vocabulary size: Loading...</span>
+                            </div>
+                        </div>
+                        <div class="glass-card stat-card bg-gradient-blue">
+                            <div class="stat-icon">🎯</div>
+                            <div class="stat-details">
+                                <span class="stat-label">Best Accuracy</span>
+                                <h3 class="stat-value" id="dash-best-accuracy">Loading...</h3>
+                                <span class="stat-sub">Across 6 models</span>
+                            </div>
+                        </div>
+                        <div class="glass-card stat-card bg-gradient-indigo">
+                            <div class="stat-icon">📄</div>
+                            <div class="stat-details">
+                                <span class="stat-label">Training Size Used</span>
+                                <h3 class="stat-value" id="dash-training-size">Loading...</h3>
+                                <span class="stat-sub">Balanced sample</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2col mt-6">
+                        <div class="glass-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Model Accuracy & F1-Score Comparison</h3>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="model-comparison-chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Dataset Class Distribution</h3>
+                            </div>
+                            <div class="chart-container-flex">
+                                <div class="chart-wrapper-small">
+                                    <canvas id="class-distribution-chart"></canvas>
+                                </div>
+                                <div class="chart-image-fallback">
+                                    <img id="static-class-distribution" src="/screenshots/class_distribution.png" alt="Class Distribution" onerror="this.style.display='none';">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2col mt-6">
+                        <div class="glass-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Top 15 Most Common Words in Positive Tweets</h3>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="positive-words-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="glass-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Top 15 Most Common Words in Negative Tweets</h3>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="negative-words-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2col mt-6">
+                        <div class="glass-card text-center">
+                            <div class="card-header">
+                                <h3 class="card-title">Word Cloud: Positive Sentiment</h3>
+                            </div>
+                            <div class="image-wrapper">
+                                <img src="/screenshots/wordcloud_positive.png" alt="Positive Word Cloud" class="dashboard-img" id="img-wordcloud-pos">
+                            </div>
+                        </div>
+
+                        <div class="glass-card text-center">
+                            <div class="card-header">
+                                <h3 class="card-title">Word Cloud: Negative Sentiment</h3>
+                            </div>
+                            <div class="image-wrapper">
+                                <img src="/screenshots/wordcloud_negative.png" alt="Negative Word Cloud" class="dashboard-img" id="img-wordcloud-neg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2col mt-6">
+                        <div class="glass-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Tweet Length Distribution</h3>
+                            </div>
+                            <div class="image-wrapper">
+                                <img src="/screenshots/tweet_length_distribution.png" alt="Tweet Length Distribution" class="dashboard-img" id="img-tweet-length">
+                            </div>
+                        </div>
+
+                        <div class="glass-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Confusion Matrix (Best Model)</h3>
+                            </div>
+                            <div class="image-wrapper">
+                                <img src="/screenshots/confusion_matrix.png" alt="Confusion Matrix" class="dashboard-img" id="img-confusion-matrix">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 5: TRAINING CONSOLE -->
+                <section class="tab-panel" id="tab-console">
+                    <div class="grid-2col">
+                        
+                        <div class="glass-card">
+                            <div class="card-header">
+                                <h2 class="card-title">Model Retraining Pipeline</h2>
+                                <span class="status-indicator idle" id="training-status-indicator">Idle</span>
+                            </div>
+                            
+                            <p class="text-secondary text-sm mb-4">
+                                Re-train all 6 machine learning models on the <strong>full 1.6-million tweet dataset</strong> using a strict <strong>70% Train, 10% Review/Validation, 20% Test</strong> split ratio.
+                            </p>
+                            
+                            <div class="form-group">
+                                <label for="train-sample-size">Training Dataset Size</label>
+                                <input type="number" id="train-sample-size" value="1600000" min="1000" max="1600000" step="5000">
+                                <span class="text-hint">Default uses all 1,600,000 tweets. Training on the full set is slow and needs the Sentiment140 CSV in <code>data/</code>.</span>
+                            </div>
+                            
+                            <div class="form-group check-group">
+                                <input type="checkbox" id="train-tune-toggle" checked>
+                                <label for="train-tune-toggle">Perform Hyperparameter Tuning (GridSearchCV)</label>
+                            </div>
+                            
+                            <div class="actions-row mt-6">
+                                <button class="btn btn-primary" id="start-training-btn">Trigger Retraining</button>
+                            </div>
+                        </div>
+
+                        <div class="glass-card flex-col">
+                            <div class="card-header">
+                                <h2 class="card-title">Console Build Logs</h2>
+                                <span class="card-badge info">Stdout</span>
+                            </div>
+                            <div class="terminal-container" id="terminal-logs">
+                                [System] Waiting for training triggers...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card mt-6">
+                        <div class="card-header">
+                            <h2 class="card-title">Model Performance Detailed Report</h2>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table" id="metrics-detailed-table">
+                                <thead>
+                                    <tr>
+                                        <th>Model Name</th>
+                                        <th>70% Train / 10% Review F1</th>
+                                        <th>20% Test Accuracy</th>
+                                        <th>Precision</th>
+                                        <th>Recall</th>
+                                        <th>20% Test F1-Score</th>
+                                        <th>Selection Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="metrics-table-body">
+                                    <tr>
+                                        <td colspan="7" class="text-center text-secondary">Loading metrics...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+    <!-- Custom JS -->
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

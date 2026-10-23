@@ -1,0 +1,156 @@
+{
+    "best_model": "Logistic Regression",
+    "results": {
+        "Bernoulli Naive Bayes": {
+            "accuracy": 0.7555398871877518,
+            "precision": 0.7430328656544302,
+            "recall": 0.7800645682001615,
+            "f1_score": 0.7610985333202087,
+            "val_accuracy": 0.7540290088638195,
+            "val_f1_score": 0.757978196233895,
+            "confusion_matrix": [
+                [
+                    3635,
+                    1337
+                ],
+                [
+                    1090,
+                    3866
+                ]
+            ]
+        },
+        "Multinomial Naive Bayes": {
+            "accuracy": 0.7522159548751007,
+            "precision": 0.7577447335811648,
+            "recall": 0.7403147699757869,
+            "f1_score": 0.7489283527250459,
+            "val_accuracy": 0.7530217566478646,
+            "val_f1_score": 0.7461697722567288,
+            "confusion_matrix": [
+                [
+                    3799,
+                    1173
+                ],
+                [
+                    1287,
+                    3669
+                ]
+            ]
+        },
+        "Logistic Regression": {
+            "accuracy": 0.7672240128928284,
+            "precision": 0.7561495254696882,
+            "recall": 0.7877320419693301,
+            "f1_score": 0.771617748789406,
+            "val_accuracy": 0.7630942788074134,
+            "val_f1_score": 0.7651757188498403,
+            "confusion_matrix": [
+                [
+                    3713,
+                    1259
+                ],
+                [
+                    1052,
+                    3904
+                ]
+            ]
+        },
+        "Linear SVM": {
+            "accuracy": 0.7503021756647864,
+            "precision": 0.7435594886922321,
+            "recall": 0.7629136400322841,
+            "f1_score": 0.7531122398167513,
+            "val_accuracy": 0.750201450443191,
+            "val_f1_score": 0.7513036502206177,
+            "confusion_matrix": [
+                [
+                    3668,
+                    1304
+                ],
+                [
+                    1175,
+                    3781
+                ]
+            ]
+        },
+        "Decision Tree": {
+            "accuracy": 0.6447421434327155,
+            "precision": 0.5989201162951682,
+            "recall": 0.8728813559322034,
+            "f1_score": 0.710403152968224,
+            "val_accuracy": 0.6349717969379532,
+            "val_f1_score": 0.7012858555885262,
+            "confusion_matrix": [
+                [
+                    2075,
+                    2897
+                ],
+                [
+                    630,
+                    4326
+                ]
+            ]
+        },
+        "Random Forest": {
+            "accuracy": 0.7270346494762289,
+            "precision": 0.7020510975170925,
+            "recall": 0.7873284907183212,
+            "f1_score": 0.7422484306638767,
+            "val_accuracy": 0.7169621273166801,
+            "val_f1_score": 0.7302745248608178,
+            "confusion_matrix": [
+                [
+                    3316,
+                    1656
+                ],
+                [
+                    1054,
+                    3902
+                ]
+            ]
+        },
+        "VADER Sentiment": {
+            "accuracy": 0.6603545527800161,
+            "precision": 0.6087912087912087,
+            "recall": 0.8942695722356739,
+            "f1_score": 0.7244197450147107,
+            "val_accuracy": 0.6603545527800161,
+            "val_f1_score": 0.7244197450147107,
+            "confusion_matrix": [
+                [
+                    2124,
+                    2848
+                ],
+                [
+                    524,
+                    4432
+                ]
+            ]
+        },
+        "Hybrid Ensemble": {
+            "accuracy": 0.7325745366639806,
+            "precision": 0.6951653944020356,
+            "recall": 0.8268765133171913,
+            "f1_score": 0.7553220901299419,
+            "val_accuracy": 0.7325745366639806,
+            "val_f1_score": 0.7553220901299419,
+            "confusion_matrix": [
+                [
+                    3175,
+                    1797
+                ],
+                [
+                    858,
+                    4098
+                ]
+            ]
+        }
+    },
+    "sample_size": 50000,
+    "vocabulary_size": 17126,
+    "split_ratio": {
+        "train": 0.7,
+        "review": 0.1,
+        "test": 0.2
+    }
+}

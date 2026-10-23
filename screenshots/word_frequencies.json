@@ -1,0 +1,126 @@
+{
+    "positive": [
+        {
+            "word": "good",
+            "count": 1950
+        },
+        {
+            "word": "love",
+            "count": 1580
+        },
+        {
+            "word": "thanks",
+            "count": 1046
+        },
+        {
+            "word": "new",
+            "count": 850
+        },
+        {
+            "word": "great",
+            "count": 746
+        },
+        {
+            "word": "night",
+            "count": 728
+        },
+        {
+            "word": "work",
+            "count": 687
+        },
+        {
+            "word": "haha",
+            "count": 655
+        },
+        {
+            "word": "happy",
+            "count": 641
+        },
+        {
+            "word": "hope",
+            "count": 615
+        },
+        {
+            "word": "morning",
+            "count": 606
+        },
+        {
+            "word": "twitter",
+            "count": 598
+        },
+        {
+            "word": "fun",
+            "count": 557
+        },
+        {
+            "word": "nice",
+            "count": 546
+        },
+        {
+            "word": "thats",
+            "count": 517
+        }
+    ],
+    "negative": [
+        {
+            "word": "work",
+            "count": 1428
+        },
+        {
+            "word": "miss",
+            "count": 999
+        },
+        {
+            "word": "good",
+            "count": 861
+        },
+        {
+            "word": "sad",
+            "count": 830
+        },
+        {
+            "word": "feel",
+            "count": 805
+        },
+        {
+            "word": "need",
+            "count": 797
+        },
+        {
+            "word": "home",
+            "count": 768
+        },
+        {
+            "word": "bad",
+            "count": 703
+        },
+        {
+            "word": "last",
+            "count": 701
+        },
+        {
+            "word": "wish",
+            "count": 699
+        },
+        {
+            "word": "night",
+            "count": 668
+        },
+        {
+            "word": "sorry",
+            "count": 654
+        },
+        {
+            "word": "hate",
+            "count": 628
+        },
+        {
+            "word": "tomorrow",
+            "count": 575
+        },
+        {
+            "word": "love",
+            "count": 567
+        }
+    ]
+}
